@@ -1,0 +1,12 @@
+body {
+    background-color: lightblue;
+    color: black;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+p, ul, ol {
+    font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+}
