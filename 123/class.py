@@ -1,4 +1,5 @@
 from pycat.base import color
+from random import choice
 from pycat.core import Window, Sprite, Color
 
 GAP = 10
