@@ -6,6 +6,7 @@ from pycat.sprite import Sprite
 
 w = Window()
 
+
 class Button(Sprite):
     def on_create(self):
         self.scale = 50
@@ -14,7 +15,7 @@ class Button(Sprite):
         self.node = None
         self.label = None
 
-    def set_message(self, x:int, y:int, msg: str, node: 'Node'):
+    def set_message(self, x: int, y: int, msg: str, node: 'Node'):
         self.message = msg
         self.node = node
         self.label = w.create_label(text=msg)
@@ -33,24 +34,25 @@ class Button(Sprite):
         self.label.delete()
         super().delete()
 
+
 class Player:
     def __init__(self):
-        self.items : List[Item] = []
-        
-player = Player()
+        self.items: List[Item] = []
 
+
+player = Player()
 
 
 class Item(Sprite):
     def on_create(self):
         self.name = ""
-        self.node = None
+        self.node: Node = None
         self.is_visible = False
 
     def on_left_click(self):
         player.items.append(self)
         self.node.remove_item(self)
-        
+
 
 class Node:
     def __init__(self, name: str, img: str):
@@ -60,7 +62,7 @@ class Node:
         self.background.is_visible = False
         self.neighbors: List[Node] = []
         self.buttons: List[Button] = []
-        self.messages:List[str] = []
+        self.messages: List[str] = []
         self.items: List[Item] = []
         print("node created")
 
