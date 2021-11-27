@@ -49,10 +49,14 @@ class Player(Sprite):
 
         platforms = w.get_sprites_with_tag("platform")
         for platform in platforms:
-            if prev_y >= platform.y + 0.5*(platform.height + self.height) and self.is_touching_sprite(platform):
+            top_y = platform.y + 0.5*(platform.height + self.height)
+            bot_y = platform.y - 0.5*(platform.height + self.height)
+            if prev_y >= top_y and self.is_touching_sprite(platform):
                 self.vy = 0
-                self.y = platform.y + 0.5*(platform.height + self.height)
                 self.is_on_platform = True
+                self.y = top_y
+            elif prev_y < bot_y and self.is_touching_sprite(platform):
+                self.vy = 0
 
 
 
