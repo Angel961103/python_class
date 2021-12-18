@@ -3,7 +3,7 @@ from pycat.base.color import Color
 from pycat.base.event.key_event import KeyCode
 from pycat.core import Window, KeyCode
 from pycat.sprite import Sprite
-# from level1 import Level1
+from platform import Platform, MovingPlatform
 
 w = Window()
 DV = 2
@@ -13,28 +13,28 @@ JUMP_SPEED = 17
 GRAVITY = 1
 
 
-class Platform(Sprite):
-    def on_create(self):
-        self.color = Color.AZURE
-        self.add_tag("platform")
-        self.height = 50
-        self.width = w.width/6
+# class Platform(Sprite):
+#     def on_create(self):
+#         self.color = Color.AZURE
+#         self.add_tag("platform")
+#         self.height = 50
+#         self.width = w.width/6
 
-class MovingPlatform(Platform):
-    def on_create(self):
-        self.state = 0
-        self.add_tag("keyplatform")
-        super().on_create()
+# class MovingPlatform(Platform):
+#     def on_create(self):
+#         self.state = 0
+#         self.add_tag("keyplatform")
+#         super().on_create()
 
-    def on_update(self, dt):
+#     def on_update(self, dt):
 
-        if self.x <= 300:
-            if self.state == 1:
-                self.x += 1
-                if self.x >= 300:
-                    self.state = 0
+#         if self.x <= 300:
+#             if self.state == 1:
+#                 self.x += 1
+#                 if self.x >= 300:
+#                     self.state = 0
 
-        return super().on_update(dt)
+#         return super().on_update(dt)
         
 
 class Button(Sprite):
