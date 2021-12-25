@@ -1,7 +1,6 @@
-from pycat.base.base_sprite import RotationMode
 from pycat.base.color import Color
 from pycat.base.event.key_event import KeyCode
-from pycat.core import Window, KeyCode
+from pycat.core import KeyCode
 from pycat.sprite import Sprite
 
 
@@ -18,7 +17,12 @@ class Platform(Sprite):
         self.height = 50
         self.width = 200
 
-        
+class Button(Sprite):
+    def on_create(self):
+        self.color = Color.MAGENTA
+        self.scale = 40
+        self.add_tag("button")
+           
         
 class MovingPlatform(Platform):
     def on_create(self):
@@ -36,11 +40,7 @@ class MovingPlatform(Platform):
 
         return super().on_update(dt)
 
-class Button(Sprite):
-    def on_create(self):
-        self.color = Color.MAGENTA
-        self.scale = 40
-        self.add_tag("button")
+
 
 
 class Key(Sprite):
@@ -48,6 +48,8 @@ class Key(Sprite):
         self.color = Color.YELLOW
         self.scale = 40
         self.vy = 0
+
+
 
 class Door(Sprite):
     def on_create(self):
