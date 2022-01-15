@@ -86,8 +86,6 @@ class Cell(Sprite):
     def on_create(self):
         self.color = Color.YELLOW
         self.scale = SCALE
-        self.x = 600
-        self.y = TOP_Y
         self.y_speed = SCALE+GAP
         self.x_speed = SCALE+GAP
         self.time = 0
