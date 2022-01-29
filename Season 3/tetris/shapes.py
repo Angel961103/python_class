@@ -101,3 +101,11 @@ T = [['.....',
       '.00..',
       '..0..',
       '.....']]
+from pycat.core import Color
+shape_colors = [Color.RED,
+                Color.GREEN,
+                Color.MAGENTA,
+                Color.YELLOW,
+                Color.ORANGE,
+                Color.BLUE,
+                Color.PURPLE]
