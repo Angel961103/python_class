@@ -81,7 +81,6 @@ def create_wall(x, y, rot):
     wall = w.create_sprite(Wall, x=x, y=y, rotation=rot)
     wall.normal()
 
-
 create_wall(400, 500, 0)
 create_wall(500, 100, 90)
 create_wall(800, 500, 180)
