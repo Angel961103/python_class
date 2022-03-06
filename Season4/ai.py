@@ -31,10 +31,14 @@ class Enemy(Sprite):
         self.target.goto_random_position()
         self.outside_circle = w.create_arc(radius=400)
         self.inside_circle = w.create_arc(radius=200)
+        self.label = w.create_label(text=str(self.state))
+        self.label.position = self.position
 
     def on_update(self, dt):
         self.outside_circle.position = self.position.as_tuple()
         self.inside_circle.position = self.position.as_tuple()
+        self.label.position = self.position
+        self.label.text = str(self.state)
         if self.state is Enemy.State.WANDER:
             self.roam()
             if self.distance_to(player) < self.outside_circle._radius:
@@ -75,6 +79,8 @@ class Enemy(Sprite):
         WANDER = auto()
         CHASE = auto()
         FIGHT = auto()
+
+
               
 player = w.create_sprite(Player)
 w.create_sprite(Enemy)
