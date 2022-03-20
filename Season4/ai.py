@@ -1,28 +1,24 @@
-
-from asyncore import compact_traceback
 from pycat.core import Window, Sprite, Color, KeyCode
 from enum import Enum, auto
-
-from pytest import Item
+from time import sleep
 
 w = Window()
 SPEED = 2
-PLAYER_SPEED = 10
+PLAYER_SPEED = 9
 
 class Player(Sprite):
     def on_create(self):
         self.scale = 50
         self.color = Color.AMBER
-        self.speed = PLAYER_SPEED
+        self.speed = float(PLAYER_SPEED)
+        
         
     def on_update(self, dt):
-        if self.is_touching_sprite(item):
-            self.speed += 0.1
-
-        # if self.is_touching_sprite(enemy):
-        #     self.speed -= 0.1
-        #     if self.speed <= 1:
-        #         w.close()
+        if self.is_touching_sprite(boomerang):
+            self.speed -= 0.1
+            if self.speed <= 0:
+                sleep(2)
+                w.close()
 
         if w.is_key_pressed(KeyCode.W):
             self.y += self.speed
@@ -38,15 +34,20 @@ class Item(Sprite):
         self.scale = 20
         self.color = Color.ORANGE
         self.goto_random_position()
+        self.label = w.create_label(text=str(round(player.speed, 3)))
 
     def on_update(self, dt):
         if self.is_touching_sprite(player):
+            player.speed += 0.1
+            self.label.text = str(round(player.speed, 3))
+            print(player.speed)
             self.goto_random_position()
 
 class Enemy(Sprite):
     def on_create(self):
         self.scale = 50
-        self.y = 100
+        self.y = 500
+        self.x = 600
         self.state = Enemy.State.WANDER
         self.target = w.create_sprite()
         self.target.color = Color.GREEN
@@ -57,13 +58,17 @@ class Enemy(Sprite):
         self.inside_circle = w.create_arc(radius=100)
         self.label = w.create_label(text=str(self.state))
         self.label.position = self.position
+        self.weapon = None
+        self.hand = w.create_sprite(scale = 2)
+        self.hand.opacity = 0
 
-    def set_weapon(self, weapon):
-        self.weapon: Sprite = weapon
+    def set_weapon(self, weapon: "Boomerang"):
+        self.weapon = weapon
+        weapon.owner = self
 
     def on_update(self, dt):
         self.circle_position()
-
+        self.hand.goto(self)
         if self.state is Enemy.State.WANDER:
             self.roam()
             if self.distance_to(player) < self.outside_circle._radius:
@@ -74,15 +79,15 @@ class Enemy(Sprite):
             if self.distance_to(player) < self.middle_circle._radius:
                 self.state = Enemy.State.CHASE
                 self.weapon.is_visible = True
+                if self.weapon.state is Boomerang.State.HOLDING:
+                    self.weapon.attack(player)
             if self.distance_to(player) > self.outside_circle._radius:
                 self.state = Enemy.State.WANDER
-                self.weapon.is_visible = False
 
         if self.state is Enemy.State.CHASE:
             self.chase()
             if self.distance_to(player) > self.middle_circle._radius:
                 self.state = Enemy.State.WARN
-                self.weapon.is_visible = False
             if self.distance_to(player) < self.inside_circle._radius:
                 self.state = Enemy.State.FIGHT
 
@@ -90,6 +95,8 @@ class Enemy(Sprite):
             self.fight()
             if self.distance_to(player) > self.inside_circle._radius:
                 self.state = Enemy.State.CHASE
+                if self.weapon.state is Boomerang.State.HOLDING:
+                    self.weapon.attack(player)
 
     def circle_position(self):
         self.outside_circle.position = self.position.as_tuple()
@@ -111,13 +118,11 @@ class Enemy(Sprite):
     def chase(self):
         self.point_toward_sprite(player)
         self.move_forward(SPEED+3)
-        # self.weapon.position = self.position
-        # self.weapon.point_toward_sprite(player)
-        # self.weapon.move_forward(self.width/2 +self.fight_sprite.width/2)
 
     def fight(self):
         self.point_toward_sprite(player)
-        self.move_forward(SPEED)
+        self.move_forward(SPEED+2)
+        # player.speed -= 1
 
     class State(Enum):
         WANDER = auto()
@@ -125,19 +130,52 @@ class Enemy(Sprite):
         CHASE = auto()
         FIGHT = auto()
 
-
 class Boomerang(Sprite):
     def on_create(self):
+        self.layer = 5
         self.color = Color.RED
-        self.scale = 20
-        self.speed = 30
-        self.is_visible = False
+        
+        self.speed = 15
         self.state = Boomerang.State.HOLDING
-        self.enemy = enemy
+        self.owner: Enemy = None
+        self.throw_distance = 0
+        self.max_d = 500
+        self.target = None
+        self.image = "b.png"
+        self.scale_to_height(20)
 
     def on_update(self, dt):
         if self.state is Boomerang.State.HOLDING:
-            self.goto(self.enemy)
+            self.goto(self.owner)
+            if self.target:
+                self.state = Boomerang.State.THROW_FOWARD
+                self.point_toward_sprite(self.target)
+                self.throw_distance = 0
+
+        if self.state is Boomerang.State.THROW_FOWARD:
+            self.move_forward(self.speed)
+            self.throw_distance += self.speed
+            self.image_rotation += 20
+            self.image_rotation %= 360
+            if self.throw_distance > self.max_d:
+                self.state = Boomerang.State.COME_BACK
+                self.target = None
+            elif self.is_touching_sprite(self.target):
+                self.state = Boomerang.State.COME_BACK
+                self.target = None
+
+        if self.state is Boomerang.State.COME_BACK:
+            self.image_rotation += 20
+            self.image_rotation %= 360
+            self.point_toward_sprite(self.owner)
+            self.move_forward(self.speed)
+            if self.is_touching_sprite(self.owner.hand):
+                self.state = Boomerang.State.HOLDING
+
+    def attack(self, target):
+        
+        self.target = target
+        
 
     class State(Enum):
         HOLDING = auto()
