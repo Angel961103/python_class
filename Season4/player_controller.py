@@ -1,6 +1,4 @@
-
 from pycat.core import Window, Sprite, KeyCode
-
 
 class PlayerController:
     def __init__(self,
