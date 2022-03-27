@@ -122,7 +122,6 @@ class Enemy(Sprite):
     def fight(self):
         self.point_toward_sprite(player)
         self.move_forward(SPEED+2)
-        # player.speed -= 1
 
     class State(Enum):
         WANDER = auto()
@@ -134,7 +133,6 @@ class Boomerang(Sprite):
     def on_create(self):
         self.layer = 5
         self.color = Color.RED
-        
         self.speed = 15
         self.state = Boomerang.State.HOLDING
         self.owner: Enemy = None
@@ -173,15 +171,12 @@ class Boomerang(Sprite):
                 self.state = Boomerang.State.HOLDING
 
     def attack(self, target):
-        
         self.target = target
-        
 
     class State(Enum):
         HOLDING = auto()
         THROW_FOWARD = auto()
         COME_BACK = auto()
-
 
 player = w.create_sprite(Player)
 item = w.create_sprite(Item)
