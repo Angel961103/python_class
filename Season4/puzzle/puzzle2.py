@@ -74,7 +74,6 @@ def get_image_grid(image_file, rows, cols, x0, y0, scale):
     return grid
 
 
-
 def randomize():
     positions = []
     for row in grid:

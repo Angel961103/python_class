@@ -64,8 +64,10 @@ class Level(Sprite):
         pass
     def on_click(self, mouse_event: MouseEvent):
         global current_texture
+        width = self.width
+        
         self.texture = current_texture
-        self.scale_to_width(self.scale)
+        self.scale_to_width(width)
 
 class Click(Sprite):
     def on_click(self, mouse_event: MouseEvent):
