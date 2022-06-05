@@ -1,14 +1,16 @@
 from enum import Enum, auto
 from pycat.core import Window, Color, Sprite, KeyCode
 from pycat.experimental.ldtk import LdtkFile
-
 from pycat.experimental.movement import FourWayMovementController as Controller
 from os.path import dirname
+from pycat.experimental.spritesheet import SpriteSheet
+from pycat.experimental.animation import Animator
+
 
 window = Window(width=17*32, height=12*32)
 
 ldtk_file = LdtkFile(dirname(__file__) + '/jumping_levels2.ldtk')
-ldtk_file.render_level(window, 'Level_0',debug_tags=True)
+ldtk_file.render_level(window, 'Level_0')
 
 class Player(Sprite):
 
@@ -16,8 +18,8 @@ class Player(Sprite):
         WALK = auto()
         JUMP = auto()
 
-    MIN_SCALE = 30
-    G = -100
+    MIN_SCALE = 0.5
+    G = -3
     JUMP_TIME = 1
 
     def set_scale(self):
@@ -32,8 +34,21 @@ class Player(Sprite):
         self.time = 0
         self.start = window.get_sprites_with_tag("player_start")[0]
         self.position = self.start.position
+        self.sprite_sheet = SpriteSheet('player.png', 64, 64)
+        self.walk_texture_left = [self.sprite_sheet.get_texture(x,2, True) for x in range(4)]
+        self.walk_texture_right = [self.sprite_sheet.get_texture(x,2) for x in range(4)]
+        self.walk_texture_front = [self.sprite_sheet.get_texture(x,1) for x in range(4)]
+        self.walk_texture_back = [self.sprite_sheet.get_texture(x,3) for x in range(4)]
+
+        self.animator = Animator()
+        self.animator.add('left', self.walk_texture_left)
+        self.animator.add('right', self.walk_texture_right)
+        self.animator.add('front', self.walk_texture_front)
+        self.animator.add('back', self.walk_texture_back)
+        self.animator.play('front')
 
     def on_update(self, dt):
+        self.texture = self.animator.tick(dt)
         self.position += self.movement_controller.get_movement_delta(dt)
 
         if self.state is Player.State.WALK:
@@ -44,6 +59,11 @@ class Player(Sprite):
                 pass
             else:
                 self.position = self.start.position
+            
+            if window.is_key_down(KeyCode.W):
+                self.animator.play('back')
+            if window.is_key_down(KeyCode.S):
+                self.animator.play('front')
 
         if self.state is Player.State.JUMP:
             self.set_scale()
