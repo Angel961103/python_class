@@ -20,6 +20,9 @@ class Player(Sprite):
     MAX_SPEED = 10
     ACCELERATION = 1
     CLIMB_SPEED = 2
+    SWIM_SPEED = 2
+
+    JUMP_KEY = KeyCode.SPACE
 
     class State(Enum):
         STANDING = auto()
@@ -27,6 +30,7 @@ class Player(Sprite):
         JUMPING = auto()
         FALLING = auto()
         CLIMBING = auto()
+        SWIMMING = auto()
 
     def on_create(self):
         self.image = "character_0001.png"
@@ -40,6 +44,7 @@ class Player(Sprite):
         self.add_tag("player")
         self.layer = 5
         self.state = Player.State.FALLING
+        self.has_key = False
 
     def is_on_a_ladder(self):
         return bool(self.get_touching_sprites_with_tag('l'))
@@ -63,14 +68,13 @@ class Player(Sprite):
         self.y += self.vy
         self.vy -= Player.GRAVITY
 
-
     def on_update(self, dt):
 
         if self.state is Player.State.STANDING:
             self.update_vx()
             if self.vx != 0:
                 self.state = Player.State.WALKING
-            if w.is_key_down(KeyCode.W):
+            if w.is_key_down(Player.JUMP_KEY):
                 self.vy = Player.JUMP_VELOCITY
                 self.state = Player.State.JUMPING
             if self.is_on_a_ladder():
@@ -79,13 +83,20 @@ class Player(Sprite):
             
         elif self.state is Player.State.WALKING:
             self.update_vx()
+            if self.get_touching_sprites_with_tag("k"):
+                self.has_key = True
+            if self.get_touching_sprites_with_tag("block"):
+                self.x -= self.vx
+            if self.get_touching_sprites_with_tag("keyhole"):
+                if self.has_key == True:
+                    pass
             if not self.is_touching_any_sprite_with_tag("g"):
                 self.state = Player.State.FALLING
                 self.vy = 0
-            if self.vx == 0:
+            elif self.vx == 0:
                 self.state = Player.State.STANDING
             
-            elif w.is_key_down(KeyCode.W):
+            elif w.is_key_down(Player.JUMP_KEY):
                 self.vy = Player.JUMP_VELOCITY
                 self.state = Player.State.JUMPING
 
@@ -98,6 +109,12 @@ class Player(Sprite):
                 if self.y - self.vy > ground_y:
                     self.y = ground_y
                     self.state = Player.State.STANDING
+            else:
+                water = self.get_touching_sprites_with_tag("water")
+                if water:
+                    water_y = water[0].y + water[0].height/2 - self.height/2
+                    if self.y < water_y:
+                        self.state = Player.State.SWIMMING
             # TO DO
             # else:
             #     l = self.get_touching_sprites_with_tag("l")
@@ -108,18 +125,20 @@ class Player(Sprite):
         elif self.state is Player.State.JUMPING:
             self.update_vx()
             self.update_vy()
+            if self.get_touching_sprites_with_tag("jump"):
+                self.vy = Player.JUMP_VELOCITY + 10
             if self.vy < 0:
                 self.state = Player.State.FALLING
         
         elif self.state is Player.State.CLIMBING:
             self.update_vx()
             if self.is_on_a_ladder():
-                if w.is_key_pressed(KeyCode.UP):
+                if w.is_key_pressed(KeyCode.W):
                     self.y += Player.CLIMB_SPEED
                     if not self.is_on_a_ladder():
                         self.state = Player.State.STANDING
                         self.vy = 0
-                if w.is_key_pressed(KeyCode.DOWN):
+                if w.is_key_pressed(KeyCode.S):
                     self.y -= Player.CLIMB_SPEED
                     if self.is_touching_any_sprite_with_tag("g"):
                         self.state = Player.State.STANDING
@@ -127,6 +146,20 @@ class Player(Sprite):
             elif not self.is_on_a_ladder():
                 self.state = Player.State.FALLING
                 self.vy = 0
+        
+        elif self.state is Player.State.SWIMMING:
+            self.update_vx()
+            if w.is_key_pressed(KeyCode.W):
+                self.y += Player.SWIM_SPEED
+            if w.is_key_pressed(KeyCode.S):
+                self.y -= Player.SWIM_SPEED
+            if self.get_touching_sprites_with_tag("g"):
+                self.x -= self.vx
+            water = self.get_touching_sprites_with_tag("water")
+            # if water:
+            #     water_y = water[0].y + water[0].height/2 + 1
+            #     if self.y > water_y:
+            #         self.state = Player.State.STANDING
 
 w.create_sprite(Level)
 w.create_sprite(Player)
