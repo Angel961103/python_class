@@ -25,6 +25,26 @@ class Key(Sprite):
             self.is_visible = False
             g.is_visible = True
 
+class KeyHole(Sprite):
+    def on_create(self):
+        self.image = "png/Level_5.png"
+        self.x = 550
+        self.y = 30
+        self.add_tag("Keyhole")
+        
+    def on_update(self, dt):
+        if self.get_touching_sprites_with_tag("player"):
+            self.is_visible = False
+            flag.is_visible = True
+
+class Flag(Sprite):
+    def on_create(self):
+        self.image = "png/Level_4.png"
+        self.x = 980
+        self.y = 230
+        self.add_tag("flag")
+        self.is_visible = False
+
 class Ground(Sprite):
     def on_create(self):
         self.image = "png/Level_3.png"
@@ -34,7 +54,9 @@ class Ground(Sprite):
         self.add_tag("g")
 
 w.create_sprite(Key)
+w.create_sprite(KeyHole)
 g = w.create_sprite(Ground)
+flag = w.create_sprite(Flag)
 
 class Player(Sprite):
     GRAVITY = 1.5
